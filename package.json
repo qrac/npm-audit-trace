@@ -1,6 +1,6 @@
 {
   "name": "npm-audit-trace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Trace npm audit vulnerabilities through the dependency tree.",
   "type": "module",
   "bin": {
