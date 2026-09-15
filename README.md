@@ -68,3 +68,8 @@ npm view <package> version
 ## License
 
 MIT
+
+## Credit
+
+- Author: [Qrac](https://qrac.jp)
+- Organization: [QRANOKO](https://qranoko.jp)
