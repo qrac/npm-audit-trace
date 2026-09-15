@@ -134,6 +134,65 @@ function getLatestVersion(name) {
 }
 
 /**
+ * @param {string} name
+ * @returns {string | null}
+ */
+function getInstalledVersion(name) {
+  const raw = execNpmQuiet(["ls", name, "--depth=0", "--json"])
+
+  if (!raw) {
+    return null
+  }
+
+  try {
+    const json = JSON.parse(raw)
+    return json?.dependencies?.[name]?.version ?? null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * @param {string} version
+ * @returns {number[] | null}
+ */
+function parseVersion(version) {
+  const match = version.match(/^v?(\d+)\.(\d+)\.(\d+)(?:[-+].*)?$/)
+
+  if (!match) {
+    return null
+  }
+
+  return [Number(match[1]), Number(match[2]), Number(match[3])]
+}
+
+/**
+ * @param {string} current
+ * @param {string} target
+ * @returns {"upgrade" | "downgrade" | null}
+ */
+function compareVersions(current, target) {
+  const currentParts = parseVersion(current)
+  const targetParts = parseVersion(target)
+
+  if (!currentParts || !targetParts) {
+    return null
+  }
+
+  for (let index = 0; index < 3; index += 1) {
+    if (targetParts[index] > currentParts[index]) {
+      return "upgrade"
+    }
+
+    if (targetParts[index] < currentParts[index]) {
+      return "downgrade"
+    }
+  }
+
+  return null
+}
+
+/**
  * @param {Vulnerability} vuln
  * @returns {string | null}
  */
@@ -144,7 +203,13 @@ function getFixTarget(vuln) {
     vuln.fixAvailable.name &&
     vuln.fixAvailable.version
   ) {
-    return `${vuln.fixAvailable.name}@${vuln.fixAvailable.version}`
+    const { name, version } = vuln.fixAvailable
+    const installedVersion = getInstalledVersion(name)
+    const direction = installedVersion
+      ? compareVersions(installedVersion, version)
+      : null
+
+    return `${name}@${version}${direction ? ` (${direction})` : ""}`
   }
 
   return null
@@ -274,6 +339,8 @@ function main() {
     const fixTarget = getFixTarget(vuln)
     const changes = fixChanges.filter((change) => change.name === name)
 
+    console.log("-".repeat(60))
+    console.log("")
     console.log(`${bold(name)}  ${vuln.range ?? ""}`)
     console.log(`Severity: ${colorSeverity(vuln.severity)}`)
 
