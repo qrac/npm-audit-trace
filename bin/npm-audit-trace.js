@@ -137,9 +137,14 @@ function getLatestVersion(name) {
  * @param {Vulnerability} vuln
  * @returns {string | null}
  */
-function getFixVersion(vuln) {
-  if (typeof vuln.fixAvailable === "object" && vuln.fixAvailable !== null) {
-    return vuln.fixAvailable.version ?? null
+function getFixTarget(vuln) {
+  if (
+    typeof vuln.fixAvailable === "object" &&
+    vuln.fixAvailable !== null &&
+    vuln.fixAvailable.name &&
+    vuln.fixAvailable.version
+  ) {
+    return `${vuln.fixAvailable.name}@${vuln.fixAvailable.version}`
   }
 
   return null
@@ -266,7 +271,7 @@ function main() {
 
   for (const [name, vuln] of vulnerabilities) {
     const latestVersion = getLatestVersion(name)
-    const fixVersion = getFixVersion(vuln)
+    const fixTarget = getFixTarget(vuln)
     const changes = fixChanges.filter((change) => change.name === name)
 
     console.log(`${bold(name)}  ${vuln.range ?? ""}`)
@@ -288,8 +293,8 @@ function main() {
       console.log(`Latest: ${latestVersion}`)
     }
 
-    if (fixVersion) {
-      console.log(`Fixed by: ${fixVersion}`)
+    if (fixTarget) {
+      console.log(`Fix via: ${fixTarget}`)
     }
 
     console.log(getFixLabel(vuln))
