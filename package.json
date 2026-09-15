@@ -1,0 +1,29 @@
+{
+  "name": "npm-audit-trace",
+  "version": "0.1.0",
+  "description": "Trace npm audit vulnerabilities through the dependency tree.",
+  "type": "module",
+  "bin": {
+    "npm-audit-trace": "./bin/npm-audit-trace.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "scripts": {
+    "check": "node --check bin/npm-audit-trace.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "npm",
+    "audit",
+    "security",
+    "vulnerability",
+    "dependencies",
+    "dependency-tree",
+    "cli"
+  ],
+  "license": "MIT"
+}
